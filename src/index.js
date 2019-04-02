@@ -15,6 +15,7 @@ const defaultComment = {
     mail: '',
     link: '',
     ua: navigator.userAgent,
+    title: '',
     url: ''
 };
 const locales = {
@@ -134,7 +135,8 @@ ValineFactory.prototype.init = function (option) {
             verify,
             visitor,
             pageSize,
-            recordIP
+            recordIP,
+            commentCallback
         } = option;
         let ds = _avatarSetting['ds'];
         let force = avatarForce ? '&q=' + Math.random().toString(32).substring(2) : '';
@@ -143,6 +145,7 @@ ValineFactory.prototype.init = function (option) {
         root.locale = root.locale || locales[lang || 'zh-cn'];
         root.notify = notify || false;
         root.verify = verify || false;
+        root.commentCallback = commentCallback || false;
 
         if (recordIP) {
             let ipScript = Utils.create('script', 'src', '//api.ip.sb/jsonip?callback=getIP');
@@ -853,6 +856,7 @@ ValineFactory.prototype.bind = function (option) {
         return acl;
     }
 
+    let articleTitle = option.title || '';
     let commitEvt = () => {
         Utils.attr(submitBtn, 'disabled', !0);
         root.loading.show(!0);
@@ -862,6 +866,10 @@ ValineFactory.prototype.bind = function (option) {
         let comment = new Ct();
         defaultComment['url'] = decodeURI(_path);
         defaultComment['insertedAt'] = new Date();
+        // 增加文章标题项
+        if(articleTitle){
+            defaultComment['title'] = option.title;
+        }
         if (atData['rid']) {
             let pid = atData['pid'] || atData['rid'];
             comment.set('rid', atData['rid']);
@@ -911,6 +919,10 @@ ValineFactory.prototype.bind = function (option) {
                 reset();
             } catch (ex) {
                 root.ErrorHandler(ex);
+            }finally{
+                if(typeof root.commentCallback === 'function'){
+                    root.commentCallback.call(root, ret, atData)
+                }
             }
         }).catch(ex => {
             root.ErrorHandler(ex);

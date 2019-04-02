@@ -3,7 +3,8 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="keywords" content="Valine,极简风,评论系统,极简风评论系统,comment system">
     <meta name="description" content="Valine - 一款基于Leancloud的极简风评论系统">
     <meta name="mobile-web-app-capable" content="yes">
@@ -72,13 +73,16 @@
             header {
                 text-align: center;
             }
+
             .sub {
                 display: block;
                 padding-bottom: 10px;
             }
+
             .container {
                 width: 100%;
             }
+
             .placeholder,
             .market {
                 display: none;
@@ -121,7 +125,7 @@
             color: #9c9c9c;
         }
     </style>
-    <script src="https://cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/leancloud-storage@3.12.0/dist/av-min.js"></script>
     <script src="./dist/Valine.min.js"></script>
 </head>
 
@@ -150,11 +154,25 @@
         var valine = new Valine();
         valine.init({
             el: '.comment',
-            app_id: '3GiiCyXCrGbOIH3EelCfJ6yw-gzGzoHsz',
-            app_key: 'iuneD4hXPQImdHQSRE0aOcRF',
+            app_id: 'yFrrKSjdlIhen9nEa9g4w7Cc-gzGzoHsz',
+            app_key: 'cysogST34jPRyw1UIytHN32X',
             placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
-            path: window.location.pathname,
-            avatar:'mm', // 1.1.7 新增(mm/identicon/monsterid/wavatar/retro)
+            visitor: true,
+            title: '快活王',
+            avatar: 'mm', // 1.1.7 新增(mm/identicon/monsterid/wavatar/retro)
+            commentCallback: function (result, sourceData) {
+                var REPLY_HOST = 'http://10.240.21.1:5010';
+                var img = new Image();
+                img.src = REPLY_HOST + '/replycomments/' + result.id;
+                var removeImageNodes = function () {
+                    img.onload = null;
+                    img.onerror = null;
+                    document.body.removeChild(img);
+                }
+                img.onload = removeImageNodes;
+                img.onerror = removeImageNodes;
+                document.body.appendChild(img);
+            }
             // guest_info: ['nick'] // 默认 ['nick', 'mail', 'link']
         })
 
@@ -166,7 +184,7 @@
             s.parentNode.insertBefore(hm, s);
         }
 
-        window.onload = function() {
+        window.onload = function () {
             var iframes = document.querySelectorAll('iframe');
             iframes[0].setAttribute('src', 'https://ghbtns.com/github-btn.html?user=xCss&repo=valine&type=watch&count=true');
             iframes[1].setAttribute('src', 'https://ghbtns.com/github-btn.html?user=xCss&type=follow&count=true');
