@@ -140,6 +140,10 @@
     <div class="container">
         <div class="placeholder"></div>
         <div class="content">
+                <span id="/" class="leancloud-visitors" data-flag-title="Your Article Title">
+                    <em class="post-meta-item-text">阅读量 </em>
+                    <i class="leancloud-visitors-count"></i>
+                </span>
             <div id="github">
                 <iframe allowtransparency="true" frameborder="0" scrolling="0" width="98" height="20"></iframe>
                 <iframe allowtransparency="true" frameborder="0" scrolling="0" width="156" height="20"></iframe>
@@ -172,6 +176,9 @@
                 img.onload = removeImageNodes;
                 img.onerror = removeImageNodes;
                 document.body.appendChild(img);
+            },
+            updateCommentNumberCallBack:function(num){
+                console.log('评论记录更新：', num);
             }
             // guest_info: ['nick'] // 默认 ['nick', 'mail', 'link']
         })
@@ -189,6 +196,39 @@
             iframes[0].setAttribute('src', 'https://ghbtns.com/github-btn.html?user=xCss&repo=valine&type=watch&count=true');
             iframes[1].setAttribute('src', 'https://ghbtns.com/github-btn.html?user=xCss&type=follow&count=true');
         }
+    </script>
+
+    <script>
+        new Valine({
+            el: '#vcomments',
+            appId: 'hbHOERNCqJueN9cgbd01AE8J-gzGzoHsz',
+            appKey: 'zYhublo6AOyge775Y8VdQU1P',
+            avatar: 'mm',
+            placeholder: '请发表您的高见',
+            visitor: true,
+            title: '{{title}}',
+            commentCallback: function (result, sourceData) {
+                if(result.get('rid')){
+                    var REPLY_HOST = 'http://synergyadmin.yiwill.cn';
+                    var img = new Image();
+                    img.src = REPLY_HOST + '/replycomments/' + result.id;
+                    var removeImageNodes = function () {
+                        img.onload = null;
+                        img.onerror = null;
+                        document.body.removeChild(img);
+                    }
+                    img.onload = removeImageNodes;
+                    img.onerror = removeImageNodes;
+                    document.body.appendChild(img);
+                }
+            },
+            updateCommentNumberCallBack:function(num){
+                var vnum = document.querySelector('.js_comments_num');
+                if(vnum){
+                    vnum.innerHTML = num || 0;
+                }
+            }
+        })
     </script>
 </body>
 
