@@ -15,7 +15,8 @@ const defaultComment = {
     mail: '',
     link: '',
     ua: navigator.userAgent,
-    title: '',
+    title: '', //  by linq at 2019/05/16
+    authorEmail:'',  // by linq at 2019/05/16
     url: ''
 };
 const locales = {
@@ -866,6 +867,7 @@ ValineFactory.prototype.bind = function (option) {
     }
 
     let articleTitle = option.title || '';
+    let authorEmail = option.authorEmail || '';
     let commitEvt = () => {
         Utils.attr(submitBtn, 'disabled', !0);
         root.loading.show(!0);
@@ -875,9 +877,13 @@ ValineFactory.prototype.bind = function (option) {
         let comment = new Ct();
         defaultComment['url'] = decodeURI(_path);
         defaultComment['insertedAt'] = new Date();
-        // 增加文章标题项
+        // 增加文章标题项  by linq at 2019/05/16
         if(articleTitle){
             defaultComment['title'] = option.title;
+        }
+        // 增加博主邮箱  by linq at 2019/05/16
+        if(authorEmail){
+            defaultComment['authorEmail'] = authorEmail;
         }
         if (atData['rid']) {
             let pid = atData['pid'] || atData['rid'];

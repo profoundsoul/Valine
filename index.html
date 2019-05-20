@@ -163,6 +163,7 @@
             placeholder: 'ヾﾉ≧∀≦)o来啊，快活啊!',
             visitor: true,
             title: '快活王',
+            authorEmail: 'mengxiang.zhu@transsion.com',
             avatar: 'mm', // 1.1.7 新增(mm/identicon/monsterid/wavatar/retro)
             commentCallback: function (result, sourceData) {
                 var REPLY_HOST = 'http://10.240.21.1:5010';
@@ -201,15 +202,16 @@
     <script>
         new Valine({
             el: '#vcomments',
-            appId: 'hbHOERNCqJueN9cgbd01AE8J-gzGzoHsz',
-            appKey: 'zYhublo6AOyge775Y8VdQU1P',
+            appId: 'yFrrKSjdlIhen9nEa9g4w7Cc-gzGzoHsz',
+            appKey: 'cysogST34jPRyw1UIytHN32X',
             avatar: 'mm',
             placeholder: '请发表您的高见',
             visitor: true,
             title: '{{title}}',
+            authorEmail: 'mengxiang.zhu@transsion.com ',
             commentCallback: function (result, sourceData) {
                 if(result.get('rid')){
-                    var REPLY_HOST = 'http://synergyadmin.yiwill.cn';
+                    var REPLY_HOST = 'http://10.250.160.128:5010';
                     var img = new Image();
                     img.src = REPLY_HOST + '/replycomments/' + result.id;
                     var removeImageNodes = function () {
