@@ -15,6 +15,8 @@ const defaultComment = {
     mail: '',
     link: '',
     ua: navigator.userAgent,
+    title: '', //  by linq at 2019/05/16
+    authorEmail:'',  // by linq at 2019/05/16
     url: ''
 };
 const locales = {
@@ -25,7 +27,7 @@ const locales = {
             link: '网址(http://)',
         },
         tips: {
-            comments: '评论',
+            comments: '条评论',
             sofa: '快来做第一个评论的人吧~',
             busy: '还在提交中，请稍候...',
             again: '这么简单也能错，也是没谁了.'
@@ -134,7 +136,9 @@ ValineFactory.prototype.init = function (option) {
             verify,
             visitor,
             pageSize,
-            recordIP
+            recordIP,
+            commentCallback,
+            updateCommentNumberCallBack
         } = option;
         let ds = _avatarSetting['ds'];
         let force = avatarForce ? '&q=' + Math.random().toString(32).substring(2) : '';
@@ -143,6 +147,8 @@ ValineFactory.prototype.init = function (option) {
         root.locale = root.locale || locales[lang || 'zh-cn'];
         root.notify = notify || false;
         root.verify = verify || false;
+        root.commentCallback = commentCallback || false;
+        root.updateCommentNumberCallBack = updateCommentNumberCallBack || false;
 
         if (recordIP) {
             let ipScript = Utils.create('script', 'src', '//api.ip.sb/jsonip?callback=getIP');
@@ -529,6 +535,12 @@ ValineFactory.prototype.bind = function (option) {
         }
     }
 
+    let updateCommentNumber = function(){
+        if(typeof root.updateCommentNumberCallBack === 'function'){
+            root.updateCommentNumberCallBack.apply(root, arguments)
+        }
+    }
+
     /**
      * XSS filter
      * @param {String} content Html String
@@ -690,6 +702,7 @@ ValineFactory.prototype.bind = function (option) {
         if (num > 0) {
             Utils.attr(Utils.find(root.el, '.vinfo'), 'style', 'display:block;');
             Utils.find(root.el, '.vcount').innerHTML = `<span class="vnum">${num}</span> ${root.locale['tips']['comments']}`;
+            updateCommentNumber(num);
             query();
         } else {
             root.loading.hide();
@@ -853,6 +866,8 @@ ValineFactory.prototype.bind = function (option) {
         return acl;
     }
 
+    let articleTitle = option.title || '';
+    let authorEmail = option.authorEmail || '';
     let commitEvt = () => {
         Utils.attr(submitBtn, 'disabled', !0);
         root.loading.show(!0);
@@ -862,6 +877,14 @@ ValineFactory.prototype.bind = function (option) {
         let comment = new Ct();
         defaultComment['url'] = decodeURI(_path);
         defaultComment['insertedAt'] = new Date();
+        // 增加文章标题项  by linq at 2019/05/16
+        if(articleTitle){
+            defaultComment['title'] = option.title;
+        }
+        // 增加博主邮箱  by linq at 2019/05/16
+        if(authorEmail){
+            defaultComment['authorEmail'] = authorEmail;
+        }
         if (atData['rid']) {
             let pid = atData['pid'] || atData['rid'];
             comment.set('rid', atData['rid']);
@@ -891,8 +914,10 @@ ValineFactory.prototype.bind = function (option) {
                     if (_count) {
                         num = Number(_count.innerText) + 1;
                         _count.innerText = num;
+                        updateCommentNumber(num);
                     } else {
                         Utils.find(root.el, '.vcount').innerHTML = '<span class="num">1</span> ' + root.locale['tips']['comments']
+                        updateCommentNumber(1);
                     }
                     insertDom(ret, Utils.find(root.el, '.vlist'));
                 }
@@ -911,6 +936,10 @@ ValineFactory.prototype.bind = function (option) {
                 reset();
             } catch (ex) {
                 root.ErrorHandler(ex);
+            }finally{
+                if(typeof root.commentCallback === 'function'){
+                    root.commentCallback.call(root, ret, atData)
+                }
             }
         }).catch(ex => {
             root.ErrorHandler(ex);
